@@ -67,11 +67,11 @@ func updateMovie(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for index, item := range movies {
 		if item.ID == params["id"] {
-			movies = append(movies[:index], movies[index+1:]...)
-			var movie Movie
-			_ = json.NewDecoder(r.Body).Decode(&movie)
-			movie.ID = params["id"]
-			json.NewEncoder(w).Encode(movies)
+			var updatedMovie Movie
+			_ = json.NewDecoder(r.Body).Decode(&updatedMovie)
+			updatedMovie.ID = params["id"]
+			movies[index] = updatedMovie
+			json.NewEncoder(w).Encode(updatedMovie)
 			return
 		}
 	}
@@ -84,11 +84,11 @@ func main() {
 	movies = append(movies, Movie{ID: "2", Isbn: "222222", Title: "Movie Two", Director: &Director{Firstname: "Steve", Lastname: "Doe"}})
 
 	router.HandleFunc("/movies", getMovies).Methods("GET")
-	router.HandleFunc("movies/{id}", getMovie).Methods("GET")
+	router.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	router.HandleFunc("/movies", createMovie).Methods("POST")
 	router.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	router.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 
 	fmt.Printf("Running on port %d\n", 8000)
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
